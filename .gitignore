@@ -70,9 +70,9 @@ google-services.json
 # AndroidX
 **/generated/**
 
-# Data Extraction Rules (ваш файл)
-**/res/xml/data_extraction_rules.xml
-**/res/xml/backup_rules.xml
+# # Data Extraction Rules (ваш файл)
+# **/res/xml/data_extraction_rules.xml
+# **/res/xml/backup_rules.xml
 
 # OS generated files
 .DS_Store
