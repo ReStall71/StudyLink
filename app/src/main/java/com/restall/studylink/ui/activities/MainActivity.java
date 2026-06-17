@@ -3,12 +3,16 @@ package com.restall.studylink.ui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.animation.OvershootInterpolator;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.restall.studylink.R;
 import com.restall.studylink.databinding.ActivityMainBinding;
 import com.restall.studylink.ui.fragments.ChatFragment;
@@ -16,11 +20,24 @@ import com.restall.studylink.ui.fragments.GroupFragment;
 import com.restall.studylink.ui.fragments.HomeFragment;
 import com.restall.studylink.ui.fragments.ProfileFragment;
 import com.restall.studylink.ui.fragments.TaskFragment;
+import com.restall.studylink.utils.FirebaseManager;
+
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private FirebaseAuth.AuthStateListener authListener;
+    private FirebaseManager firebaseManager;
+
+//    Hashtable<String, List<Integer>> fabValues = new Hashtable<>(Map.of(
+//            // Название: фрагмент, fab (иконка, название, обработчик)
+//            R.string.home_bottom_nav, List.of(R.drawable.ic_home_48dp, R.string.home_fab),
+//            R.string.tasks_bottom_nav, List.of(R.drawable.ic_add_alert_48dp, R.string.tasks_fab),
+//            R.string.chats_bottom_nav, List.of(R.drawable.ic)
+//    ));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,14 +45,14 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        authListener = firebaseAuth -> {
-            if (firebaseAuth.getCurrentUser() == null) {
-                Intent intent = new Intent(this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
-            }
-        };
+        firebaseManager = new FirebaseManager();
+
+        if (firebaseManager.getCurrentUser() == null) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        }
 
         if (savedInstanceState == null) {
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
@@ -45,29 +62,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if (FirebaseAuth.getInstance().getCurrentUser()==null){
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            finish();
-            return;
-        }
-
         setupBottomNavigation();
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.addAuthStateListener(authListener);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (authListener != null) {
-            FirebaseAuth.getInstance().removeAuthStateListener(authListener);
-        }
     }
     private void setupBottomNavigation() {
         binding.bottomNavigationBar.setOnItemSelectedListener(menuItem -> {
@@ -110,10 +106,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void changeFragment(Fragment fragment) {
+    private void changeFragment(Fragment newFragment) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_frame, fragment)
+                .replace(R.id.fragment_frame, newFragment)
                 .commit();
     }
 

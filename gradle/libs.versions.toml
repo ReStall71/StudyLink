@@ -17,6 +17,7 @@ firebaseFirestore = "26.1.1"
 annotation = "1.6.0"
 lifecycleLivedataKtx = "2.10.0"
 lifecycleViewmodelKtx = "2.10.0"
+roomRuntime = "2.8.4"
 
 [libraries]
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
@@ -36,6 +37,9 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

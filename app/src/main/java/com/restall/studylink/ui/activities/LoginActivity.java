@@ -1,23 +1,19 @@
 package com.restall.studylink.ui.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-
 import com.restall.studylink.databinding.ActivityLoginBinding;
+import com.restall.studylink.utils.FirebaseManager;
 
 public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
+    private FirebaseManager firebaseManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,30 +21,45 @@ public class LoginActivity extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.loginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (binding.emailEt.getText().toString().isEmpty() || binding.passwordEt.getText().toString().isEmpty()){
-                    Toast.makeText(getApplicationContext(), "Fields cannot be empty", Toast.LENGTH_SHORT).show();
-                }else{
-                    FirebaseAuth.getInstance().signInWithEmailAndPassword(binding.emailEt.getText().toString(), binding.passwordEt.getText().toString())
-                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()){
-                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                    }
-                                }
-                            });
-                }
+        firebaseManager = new FirebaseManager();
+
+        // Если уже залогинен – сразу в MainActivity
+//        if (firebaseManager.getCurrentUser() != null) {
+//            startActivity(new Intent(this, MainActivity.class));
+//            finish();
+//        }
+
+        binding.loginBtn.setOnClickListener(v -> {
+            String email = binding.emailEt.getText().toString().trim();
+            String password = binding.passwordEt.getText().toString().trim();
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Введите email и пароль", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            firebaseManager.loginUser(email, password, new FirebaseManager.AuthCallback() {
+                @Override
+                public void onSuccess() {
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
+                }
+
+                @Override
+                public void onFailure(String error) {
+                    Toast.makeText(LoginActivity.this, "Ошибка: " + error, Toast.LENGTH_LONG).show();
+                }
+            });
         });
 
-        binding.goToRegisterActivityTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-            }
+        binding.goToRegisterActivityTv.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding = null;
     }
 }

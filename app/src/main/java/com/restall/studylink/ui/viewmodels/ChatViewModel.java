@@ -9,17 +9,17 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 public class ChatViewModel extends AndroidViewModel {
-    private ChatRepository repository;
-    private LiveData<List<Chat>> allChats
-
+//    private ChatRepository repository;
+//    private LiveData<List<Chat>> allChats
+//
     public ChatViewModel(@NonNull Application application) {
         super(application);
-        repository = new ChatRepository(application);
-        allChats = repository.getAllChats();
+//        repository = new ChatRepository(application);
+//        allChats = repository.getAllChats();
     }
 
-    public LiveData<List<Chat>> getAllChats() {
-        return allChats;
-    }
-
+//    public LiveData<List<Chat>> getAllChats() {
+//        return allChats;
+//    }
+//
 }

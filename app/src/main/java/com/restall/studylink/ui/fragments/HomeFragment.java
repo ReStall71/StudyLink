@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.restall.studylink.R;
 
 /**
@@ -15,7 +16,7 @@ import com.restall.studylink.R;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements FabActionProvider{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -62,5 +63,14 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
+    }
+
+    @Override
+    public void setupFabAction(FloatingActionButton fab) {
+        fab.setImageResource(R.drawable.ic_add_48dp);
+        fab.setContentDescription(getString(R.string.home_fab));
+        fab.setOnClickListener(v -> {
+//            showAddDialog();
+        });
     }
 }

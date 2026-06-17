@@ -1,25 +1,17 @@
 package com.restall.studylink.ui.activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
 import com.restall.studylink.databinding.ActivityRegisterBinding;
-
-import java.util.HashMap;
+import com.restall.studylink.utils.FirebaseManager;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private ActivityRegisterBinding binding;
+    private FirebaseManager firebaseManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,34 +19,38 @@ public class RegisterActivity extends AppCompatActivity {
         binding = ActivityRegisterBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.signUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (binding.emailEt.getText().toString().isEmpty() || binding.passwordEt.getText().toString().isEmpty()
-                        || binding.usernameEt.getText().toString().isEmpty()){
-                    Toast.makeText(getApplicationContext(), "Fields cannot be empty", Toast.LENGTH_SHORT).show();
-                }else{
-                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(binding.emailEt.getText().toString(), binding.passwordEt.getText().toString())
-                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()){
-                                        HashMap<String, String> userInfo = new HashMap<>();
-                                        userInfo.put("email", binding.emailEt.getText().toString());
-                                        userInfo.put("username", binding.usernameEt.getText().toString());
-                                        userInfo.put("profileImage", "");
-                                        userInfo.put("chats", "");
+        firebaseManager = new FirebaseManager();
 
-                                        FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                                .setValue(userInfo);
+        binding.signUpBtn.setOnClickListener(v -> {
+            String email = binding.emailEt.getText().toString().trim();
+            String password = binding.passwordEt.getText().toString().trim();
+            String name = binding.usernameEt.getText().toString().trim();
 
-                                        startActivity(new Intent(RegisterActivity.this, MainActivity.class));
-                                    }
-                                }
-                            });
-
-                }
+            if (email.isEmpty() || password.isEmpty() || name.isEmpty()) {
+                Toast.makeText(this, "Заполните все поля", Toast.LENGTH_SHORT).show();
+                return;
             }
+            if (password.length() < 6) {
+                Toast.makeText(this, "Пароль должен быть не менее 6 символов", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            firebaseManager.registerUser(email, password, name, new FirebaseManager.AuthCallback() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(RegisterActivity.this, "Регистрация успешна", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                @Override
+                public void onFailure(String error) {
+                    Toast.makeText(RegisterActivity.this, "Ошибка: " + error, Toast.LENGTH_LONG).show();
+                }
+            });
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding = null;
     }
 }
